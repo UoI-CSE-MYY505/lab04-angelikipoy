@@ -28,6 +28,20 @@ arrayNotSorted: .word marianna, markos, maria
 str_ge:
 #---------
 # Write the subroutine code here
+lbu  t0, 0(a0)
+            lbu  t1, 0(a1)
+            sub  t2, t0,   t1  # result: 0 if equal,
+                               # >0 if char @a0 "higher", <0 if char @a1 "higher"
+            addi a0, a0,   1
+            addi a1, a1,   1
+            add  t3, t1,   t0  # if the sum is equal to either one, one must be 0
+            beq  t3, t0,   ret_strcmp  # any string finished, leave
+            # I could have compared each of t0, t1 to zero. Still 2 instructions (beq's)
+            beq  t2, zero, str_ge  #still equal, loop
+ret_strcmp:
+            srli a0, t2, 31  # get the sign bit. If 1, negative, so strictly less
+            xori a0, a0, 1 # Invert it. So a0 is 1 if greater or equal.
+            
 #  You may move jr ra   if you wish.
 #---------
             jr   ra
